@@ -65,6 +65,7 @@ module.exports = function (app, passport) {
   // set views path, template engine and default layout
   app.engine('html', swig.renderFile);
   app.set('views', config.root + '/app/views');
+  //app.engine('jade', require('jade').__express);
   app.set('view engine', 'html');
 
   // expose package.json to views
@@ -75,7 +76,9 @@ module.exports = function (app, passport) {
   });
 
   // bodyParser should be above methodOverride
-  app.use(bodyParser());
+  app.use( bodyParser.urlencoded({ extended: false }) );
+  app.use( bodyParser.json() );
+
   app.use(methodOverride(function (req, res) {
     if (req.body && typeof req.body === 'object' && '_method' in req.body) {
       // look in urlencoded POST bodies and delete it
@@ -93,7 +96,10 @@ module.exports = function (app, passport) {
     store: new mongoStore({
       url: config.db,
       collection : 'sessions'
-    })
+    }),
+    proxy: true,
+    resave: true,
+    saveUninitialized: true
   }));
 
   // use passport session
